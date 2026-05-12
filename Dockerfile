@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Expose port
-EXPOSE 8000
+# Expose port (Hugging Face uses 7860)
+EXPOSE 7860
 
-# Start uvicorn server. We use $PORT provided by Render
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Start uvicorn server
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]
