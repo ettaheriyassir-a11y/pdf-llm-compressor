@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: pdf-llm-compressor
+    env: docker
+    plan: free
+    healthCheckPath: /
+

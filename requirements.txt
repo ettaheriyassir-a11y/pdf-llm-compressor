@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-multipart
+pymupdf
+tiktoken
+jinja2
+pytesseract
+Pillow

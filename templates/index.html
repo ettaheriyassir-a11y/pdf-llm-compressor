@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF → LLM Compressor | Minimize Token Usage</title>
+  <meta name="description" content="Convert PDF documents into highly compressed, token-efficient XML for Claude, GPT and other LLMs. Real-time token savings analytics." />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+  <div style="position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:32px 20px 80px;">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header style="text-align:center; padding: 40px 0 20px;">
+      <div style="margin-bottom:16px;">
+        <span class="badge badge-primary pulse-glow">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="4.5"/></svg>
+          LLM Token Optimizer
+        </span>
+      </div>
+      <h1 class="gradient-text" style="font-size:clamp(2rem,5vw,3.4rem); font-weight:800; line-height:1.1; letter-spacing:-0.03em; margin-bottom:16px;">
+        PDF → XML Compressor
+      </h1>
+      <p style="color:var(--text-2); font-size:1.05rem; max-width:560px; margin:0 auto;">
+        Upload a PDF and get a semantically-faithful, token-minimized XML ready for Claude, GPT-4, Gemini and any large-context LLM.
+      </p>
+    </header>
+
+    <!-- ── Settings Card ───────────────────────────────────── -->
+    <div class="glass-card" style="border-radius:var(--radius); padding:24px 28px; margin:28px 0;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+        <svg width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span style="font-weight:600; font-size:0.95rem;">Compression Settings</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:10px;">
+        <label class="toggle-wrap" for="dictCompression">
+          <input type="checkbox" id="dictCompression" checked />
+          <div>
+            <div style="font-size:0.85rem; font-weight:500; color:var(--text-1);">Dictionary Compression</div>
+            <div style="font-size:0.72rem; color:var(--text-3);">Replace repeated phrases with short refs</div>
+          </div>
+        </label>
+        <label class="toggle-wrap" for="semanticDeduplication">
+          <input type="checkbox" id="semanticDeduplication" checked />
+          <div>
+            <div style="font-size:0.85rem; font-weight:500; color:var(--text-1);">Strip Headers / Footers</div>
+            <div style="font-size:0.72rem; color:var(--text-3);">Remove repeated page decorations</div>
+          </div>
+        </label>
+        <label class="toggle-wrap" for="minifyXml">
+          <input type="checkbox" id="minifyXml" checked />
+          <div>
+            <div style="font-size:0.85rem; font-weight:500; color:var(--text-1);">Minify XML Output</div>
+            <div style="font-size:0.72rem; color:var(--text-3);">Remove whitespace &amp; indentation</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Gap 4: configurable chunk size -->
+      <div style="margin-top:14px; border-top:1px solid var(--border); padding-top:14px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div>
+          <div style="font-size:0.85rem; font-weight:500; color:var(--text-1);">RAG Chunk Size</div>
+          <div style="font-size:0.72rem; color:var(--text-3);">Max tokens per chunk (200 – 4 000)</div>
+        </div>
+        <input type="number" id="chunkSize" class="chunk-size-input"
+               value="800" min="200" max="4000" step="100" />
+      </div>
+    </div>
+
+    <!-- ── Upload Zone ──────────────────────────────────────── -->
+    <div id="dropzone" class="glass-card" style="position:relative; border-radius:20px; padding:52px 32px; text-align:center; cursor:pointer; margin-bottom:28px; overflow:hidden;">
+      <input type="file" id="fileInput" accept="application/pdf"
+             style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;" />
+
+      <div id="dropzoneInner" style="pointer-events:none;">
+        <div class="upload-icon-wrap" style="margin-bottom:20px;">
+          <svg width="32" height="32" fill="none" stroke="var(--primary)" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+        </div>
+        <h3 style="font-size:1.15rem; font-weight:700; margin-bottom:8px; color:var(--text-1);">
+          Drag &amp; Drop your PDF here
+        </h3>
+        <p style="font-size:0.85rem; color:var(--text-3);">or click to browse &nbsp;·&nbsp; PDF only</p>
+
+        <div id="filePill" style="margin-top:18px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span id="filePillName">—</span>
+        </div>
+      </div>
+
+      <!-- Loading overlay -->
+      <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div>
+          <p style="font-weight:600; color:var(--primary); margin-bottom:4px;" id="loadingText">Processing document…</p>
+          <p style="font-size:0.78rem; color:var(--text-3);">Parsing PDF · Building dictionary · Counting tokens</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Results Section (hidden until upload) ────────────── -->
+    <div id="resultsSection" class="hidden fade-in-up" style="display:none; flex-direction:column; gap:20px;">
+
+      <!-- Metric cards row -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px;">
+
+        <!-- Original tokens -->
+        <div class="glass-card metric-card">
+          <div>
+            <p class="metric-label">Original Tokens</p>
+            <p class="metric-value" id="originalTokens" style="color:var(--text-2);">—</p>
+          </div>
+          <div class="metric-icon" style="background:rgba(255,255,255,0.05);">
+            <svg width="20" height="20" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Compressed tokens -->
+        <div class="glass-card metric-card" style="border-bottom: 2px solid var(--green);">
+          <div>
+            <p class="metric-label">Compressed Tokens</p>
+            <p class="metric-value" id="compressedTokens" style="color:var(--green);">—</p>
+          </div>
+          <div class="metric-icon" style="background:var(--green-glow);">
+            <svg width="20" height="20" fill="none" stroke="var(--green)" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Savings % -->
+        <div class="glass-card metric-card" style="border-bottom: 2px solid var(--primary-dark);">
+          <div style="flex:1;">
+            <p class="metric-label">Token Savings</p>
+            <p class="metric-value" id="savingsPercent" style="color:var(--primary);">—</p>
+            <div id="savingsBarTrack" style="margin-top:10px;"><div id="savingsBar"></div></div>
+          </div>
+          <div class="metric-icon" style="background:var(--primary-glow);">
+            <svg width="20" height="20" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output panel -->
+      <div class="glass-card" style="border-radius:var(--radius); overflow:hidden;">
+
+        <!-- Tab bar -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:rgba(0,0,0,0.2); border-bottom:1px solid var(--border);">
+          <div style="display:flex; gap:24px;">
+            <button id="tabXml"    class="tab-btn active">Full XML</button>
+            <button id="tabChunks" class="tab-btn">RAG Chunks</button>
+          </div>
+          <div style="display:flex; gap:8px; padding:10px 0;">
+            <button id="copyBtn" class="btn btn-ghost">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="btn btn-primary">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+
+        <!-- XML view -->
+        <div id="xmlView">
+          <textarea id="xmlOutput" spellcheck="false" readonly placeholder="XML output will appear here…"></textarea>
+        </div>
+
+        <!-- Chunks view -->
+        <div id="chunksView" class="hidden" style="padding:16px; display:flex; flex-direction:column; gap:12px; max-height:480px; overflow-y:auto;">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+      <!-- Re-upload hint -->
+      <p style="text-align:center; font-size:0.78rem; color:var(--text-3);">
+        Drop another PDF onto the upload zone above to process a new file.
+      </p>
+    </div>
+
+  </div><!-- /container -->
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

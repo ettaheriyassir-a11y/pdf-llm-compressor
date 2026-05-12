@@ -1,0 +1,346 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Reset & Base ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:       #818cf8;
+  --primary-dark:  #6366f1;
+  --primary-glow:  rgba(99, 102, 241, 0.35);
+  --green:         #34d399;
+  --green-glow:    rgba(52, 211, 153, 0.25);
+  --bg:            #070b14;
+  --surface-1:     #0d1424;
+  --surface-2:     #131d30;
+  --surface-3:     #1a2540;
+  --border:        rgba(255,255,255,0.07);
+  --text-1:        #f1f5f9;
+  --text-2:        #94a3b8;
+  --text-3:        #64748b;
+  --mono:          'JetBrains Mono', 'Courier New', monospace;
+  --sans:          'Inter', system-ui, sans-serif;
+  --radius:        14px;
+  --radius-sm:     8px;
+  --shadow-glow:   0 0 40px rgba(99,102,241,0.12);
+  --transition:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── Background ambient orbs ────────────────────────────────── */
+body::before, body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(120px);
+}
+body::before {
+  width: 600px; height: 600px;
+  top: -200px; left: -200px;
+  background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+}
+body::after {
+  width: 500px; height: 500px;
+  bottom: -150px; right: -150px;
+  background: radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%);
+}
+
+/* ── Glass Card ─────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(13, 20, 36, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Gradient Text ──────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #a5b4fc 0%, var(--primary) 40%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Badge / Tag pill ───────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.badge-primary {
+  background: rgba(99,102,241,0.15);
+  color: var(--primary);
+  border: 1px solid rgba(99,102,241,0.3);
+}
+
+/* ── Upload zone ────────────────────────────────────────────── */
+#dropzone {
+  border: 2px dashed rgba(99,102,241,0.35);
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+#dropzone:hover, #dropzone.drag-over {
+  border-color: var(--primary);
+  background: rgba(99,102,241,0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px var(--primary-glow);
+}
+#dropzone .upload-icon-wrap {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(192,132,252,0.1));
+  border: 1px solid rgba(99,102,241,0.25);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+#dropzone:hover .upload-icon-wrap {
+  transform: scale(1.1);
+  box-shadow: 0 0 24px var(--primary-glow);
+}
+
+/* ── Toggle / Checkbox ──────────────────────────────────────── */
+.toggle-wrap {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(19,29,48,0.6);
+  transition: border-color var(--transition), background var(--transition);
+  user-select: none;
+}
+.toggle-wrap:hover { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.06); }
+
+.toggle-wrap input[type="checkbox"] {
+  appearance: none;
+  width: 38px; height: 22px;
+  border-radius: 11px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.toggle-wrap input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--text-3);
+  transition: transform var(--transition), background var(--transition);
+}
+.toggle-wrap input[type="checkbox"]:checked { background: var(--primary-dark); border-color: var(--primary); }
+.toggle-wrap input[type="checkbox"]:checked::after { transform: translateX(16px); background: #fff; }
+
+/* ── Metric cards ───────────────────────────────────────────── */
+.metric-card {
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+}
+.metric-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.metric-value {
+  font-size: 1.75rem; font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.metric-label {
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+/* Savings progress bar */
+#savingsBar {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--primary-dark), var(--green));
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+#savingsBarTrack {
+  height: 4px; border-radius: 2px;
+  background: var(--surface-3); overflow: hidden;
+  margin-top: 8px;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.tab-btn {
+  font-size: 0.82rem; font-weight: 600;
+  padding: 8px 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+  color: var(--text-3);
+  background: none; border-top: none; border-left: none; border-right: none;
+  cursor: pointer;
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-btn:hover:not(.active) { color: var(--text-1); }
+
+/* ── Action buttons ─────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  border: 1px solid transparent;
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--border);
+  color: var(--text-2);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.09); color: var(--text-1); border-color: rgba(255,255,255,0.15); }
+.btn-primary {
+  background: var(--primary-dark);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(99,102,241,0.3);
+}
+.btn-primary:hover { background: #5053e5; box-shadow: 0 0 24px rgba(99,102,241,0.5); transform: translateY(-1px); }
+
+/* ── Code output ────────────────────────────────────────────── */
+#xmlOutput {
+  width: 100%; height: 420px;
+  background: transparent;
+  color: #c4cde0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  padding: 20px;
+  resize: none;
+  border: none;
+  outline: none;
+}
+
+/* ── Chunk cards ────────────────────────────────────────────── */
+.chunk-card {
+  background: rgba(19,29,48,0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+.chunk-card:hover { border-color: rgba(99,102,241,0.3); }
+.chunk-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border);
+}
+.chunk-body {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: #9dafc8;
+  padding: 14px 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ── Loading overlay ────────────────────────────────────────── */
+#loadingOverlay {
+  position: absolute; inset: 0;
+  background: rgba(7,11,20,0.75);
+  backdrop-filter: blur(8px);
+  border-radius: inherit;
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 16px;
+  z-index: 10;
+}
+#loadingOverlay.visible { display: flex; }
+
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(99,102,241,0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ── File pill ──────────────────────────────────────────────── */
+#filePill {
+  display: none;
+  align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.25);
+  font-size: 0.78rem; font-weight: 500; color: var(--primary);
+}
+#filePill.visible { display: inline-flex; }
+
+/* ── Scrollbars ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--primary-glow); }
+  50%       { box-shadow: 0 0 16px 4px var(--primary-glow); }
+}
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+/* ── Chunk size number input ─────────────────────────────────── */
+.chunk-size-input {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  width: 88px;
+  text-align: center;
+  transition: border-color var(--transition);
+  outline: none;
+  margin-left: auto;
+}
+.chunk-size-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.chunk-size-input::-webkit-inner-spin-button { opacity: 0.6; }
+
+/* ── Utility ────────────────────────────────────────────────── */
+.divider { height: 1px; background: var(--border); }
+.hidden { display: none !important; }
+.text-mono { font-family: var(--mono); }
+
